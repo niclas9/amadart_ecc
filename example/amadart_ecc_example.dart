@@ -1,12 +1,3 @@
-# Elliptic curve cryptography (ECC) in Dart
-
-Elliptic curve cryptography lib for AMA based blockchain in Dart lang.
-
-## Usage
-
-A simple usage example:
-
-```dart
 import 'package:amadart_ecc/amadart_ecc.dart';
 
 main() {
@@ -27,17 +18,10 @@ main() {
   // Print the AMA signature
   print(signature.toString());
 
+  // Recover the AMAPublicKey used to sign the data
+  var recoveredAMAPublicKey = signature.recover(data);
+  print(recoveredAMAPublicKey.toString());
+
   // Verify the data using the signature
   signature.verify(data, publicKey);
 }
-```
-
-## Features and bugs
-
-Please file feature requests and bugs at the [issue tracker][tracker].
-
-## References
-
-eosjs-ecc: https://github.com/EOSIO/eosjs-ecc
-
-[tracker]: https://github.com/niclas9/amadart_ecc/issues

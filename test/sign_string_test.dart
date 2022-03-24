@@ -1,18 +1,18 @@
-import 'package:eosdart_ecc/eosdart_ecc.dart';
+import '../lib/amadart_ecc.dart';
 import 'package:test/test.dart';
 
-EOSPrivateKey privateKey = EOSPrivateKey.fromString(
+AMAPrivateKey privateKey = AMAPrivateKey.fromString(
     '5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3');
-EOSPublicKey publicKey = privateKey.toEOSPublicKey();
+AMAPublicKey publicKey = privateKey.toAMAPublicKey();
 
 bool eccSignAndVerify(String data) {
   privateKey.signString(data).toString();
-  EOSSignature signature = privateKey.signString(data);
+  AMASignature signature = privateKey.signString(data);
   return signature.verify(data, publicKey);
 }
 
 void main() {
-  group('EOS signature string tests', () {
+  group('AMA signature string tests', () {
     test('ECC Sign #1', () {
       var result = eccSignAndVerify('data');
       expect(result, true);

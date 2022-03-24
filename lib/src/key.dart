@@ -10,40 +10,40 @@ import './exception.dart';
 import './key_base.dart';
 import './signature.dart';
 
-/// EOS Public Key
-class EOSPublicKey extends EOSKey {
+/// AMA Public Key
+class AMAPublicKey extends AMAKey {
   ECPoint? q;
 
-  /// Construct EOS public key from buffer
-  EOSPublicKey.fromPoint(this.q);
+  /// Construct AMA public key from buffer
+  AMAPublicKey.fromPoint(this.q);
 
-  /// Construct EOS public key from string
-  factory EOSPublicKey.fromString(String keyStr) {
+  /// Construct AMA public key from string
+  factory AMAPublicKey.fromString(String keyStr) {
     RegExp publicRegex = RegExp(r"^PUB_([A-Za-z0-9]+)_([A-Za-z0-9]+)",
         caseSensitive: true, multiLine: false);
     Iterable<Match> match = publicRegex.allMatches(keyStr);
 
     if (match.isEmpty) {
-      RegExp eosRegex = RegExp(r"^EOS", caseSensitive: true, multiLine: false);
-      if (!eosRegex.hasMatch(keyStr)) {
-        throw InvalidKey("No leading EOS");
+      RegExp amaRegex = RegExp(r"^AMA", caseSensitive: true, multiLine: false);
+      if (!amaRegex.hasMatch(keyStr)) {
+        throw InvalidKey("No leading AMA");
       }
       String publicKeyStr = keyStr.substring(3);
-      Uint8List buffer = EOSKey.decodeKey(publicKeyStr);
-      return EOSPublicKey.fromBuffer(buffer);
+      Uint8List buffer = AMAKey.decodeKey(publicKeyStr);
+      return AMAPublicKey.fromBuffer(buffer);
     } else if (match.length == 1) {
       Match m = match.first;
       String? keyType = m.group(1);
-      Uint8List buffer = EOSKey.decodeKey(m.group(2)!, keyType);
-      return EOSPublicKey.fromBuffer(buffer);
+      Uint8List buffer = AMAKey.decodeKey(m.group(2)!, keyType);
+      return AMAPublicKey.fromBuffer(buffer);
     } else {
       throw InvalidKey('Invalid public key format');
     }
   }
 
-  factory EOSPublicKey.fromBuffer(Uint8List buffer) {
-    ECPoint? point = EOSKey.secp256k1.curve.decodePoint(buffer);
-    return EOSPublicKey.fromPoint(point);
+  factory AMAPublicKey.fromBuffer(Uint8List buffer) {
+    ECPoint? point = AMAKey.secp256k1.curve.decodePoint(buffer);
+    return AMAPublicKey.fromPoint(point);
   }
 
   Uint8List toBuffer() {
@@ -52,24 +52,24 @@ class EOSPublicKey extends EOSKey {
   }
 
   String toString() {
-    return 'EOS' + EOSKey.encodeKey(this.toBuffer(), keyType);
+    return 'AMA' + AMAKey.encodeKey(this.toBuffer(), keyType);
   }
 }
 
-/// EOS Private Key
-class EOSPrivateKey extends EOSKey {
+/// AMA Private Key
+class AMAPrivateKey extends AMAKey {
   Uint8List? d;
   String? format;
 
   late BigInt _r;
   late BigInt _s;
 
-  /// Constructor EOS private key from the key buffer itself
-  EOSPrivateKey.fromBuffer(this.d);
+  /// Constructor AMA private key from the key buffer itself
+  AMAPrivateKey.fromBuffer(this.d);
 
   /// Construct the private key from string
   /// It can come from WIF format for PVT format
-  EOSPrivateKey.fromString(String keyStr) {
+  AMAPrivateKey.fromString(String keyStr) {
     RegExp privateRegex = RegExp(r"^PVT_([A-Za-z0-9]+)_([A-Za-z0-9]+)",
         caseSensitive: true, multiLine: false);
     Iterable<Match> match = privateRegex.allMatches(keyStr);
@@ -78,9 +78,9 @@ class EOSPrivateKey extends EOSKey {
       format = 'WIF';
       keyType = 'K1';
       // WIF
-      Uint8List keyWLeadingVersion = EOSKey.decodeKey(keyStr, EOSKey.SHA256X2);
+      Uint8List keyWLeadingVersion = AMAKey.decodeKey(keyStr, AMAKey.SHA256X2);
       int version = keyWLeadingVersion.first;
-      if (EOSKey.VERSION != version) {
+      if (AMAKey.VERSION != version) {
         throw InvalidKey("version mismatch");
       }
 
@@ -97,21 +97,21 @@ class EOSPrivateKey extends EOSKey {
       format = 'PVT';
       Match m = match.first;
       keyType = m.group(1);
-      d = EOSKey.decodeKey(m.group(2)!, keyType);
+      d = AMAKey.decodeKey(m.group(2)!, keyType);
     } else {
       throw InvalidKey('Invalid Private Key format');
     }
   }
 
-  /// Generate EOS private key from seed. Please note: This is not random!
+  /// Generate AMA private key from seed. Please note: This is not random!
   /// For the given seed, the generated key would always be the same
-  factory EOSPrivateKey.fromSeed(String seed) {
+  factory AMAPrivateKey.fromSeed(String seed) {
     Digest s = sha256.convert(utf8.encode(seed));
-    return EOSPrivateKey.fromBuffer(Uint8List.fromList(s.bytes));
+    return AMAPrivateKey.fromBuffer(Uint8List.fromList(s.bytes));
   }
 
-  /// Generate the random EOS private key
-  factory EOSPrivateKey.fromRandom() {
+  /// Generate the random AMA private key
+  factory AMAPrivateKey.fromRandom() {
 //    final int randomLimit = 1 << 32;
     final int randomLimit = 4294967296;
     Random randomGenerator;
@@ -135,35 +135,35 @@ class EOSPrivateKey extends EOSKey {
     entropy.addAll(entropy3);
     Uint8List randomKey = Uint8List.fromList(entropy);
     Digest d = sha256.convert(randomKey);
-    return EOSPrivateKey.fromBuffer(Uint8List.fromList(d.bytes));
+    return AMAPrivateKey.fromBuffer(Uint8List.fromList(d.bytes));
   }
 
   /// Check if the private key is WIF format
   bool isWIF() => this.format == 'WIF';
 
   /// Get the public key string from this private key
-  EOSPublicKey toEOSPublicKey() {
+  AMAPublicKey toAMAPublicKey() {
     BigInt privateKeyNum = decodeBigIntWithSign(1, this.d!);
-    ECPoint? ecPoint = EOSKey.secp256k1.G * privateKeyNum;
+    ECPoint? ecPoint = AMAKey.secp256k1.G * privateKeyNum;
 
-    return EOSPublicKey.fromPoint(ecPoint);
+    return AMAPublicKey.fromPoint(ecPoint);
   }
 
   /// Sign the bytes data using the private key
-  EOSSignature sign(Uint8List data) {
+  AMASignature sign(Uint8List data) {
     Digest d = sha256.convert(data);
     return signHash(Uint8List.fromList(d.bytes));
   }
 
   /// Sign the string data using the private key
-  EOSSignature signString(String data) {
+  AMASignature signString(String data) {
     return sign(Uint8List.fromList(utf8.encode(data)));
   }
 
   /// Sign the SHA256 hashed data using the private key
-  EOSSignature signHash(Uint8List sha256Data) {
+  AMASignature signHash(Uint8List sha256Data) {
     int nonce = 0;
-    BigInt n = EOSKey.secp256k1.n;
+    BigInt n = AMAKey.secp256k1.n;
     BigInt e = decodeBigIntWithSign(1, sha256Data);
 
     while (true) {
@@ -174,27 +174,27 @@ class EOSPrivateKey extends EOSKey {
       }
       ECSignature sig = ECSignature(_r, _s);
 
-      Uint8List der = EOSSignature.ecSigToDER(sig);
+      Uint8List der = AMASignature.ecSigToDER(sig);
 
       int lenR = der.elementAt(3);
       int lenS = der.elementAt(5 + lenR);
       if (lenR == 32 && lenS == 32) {
-        int i = EOSSignature.calcPubKeyRecoveryParam(
-            decodeBigIntWithSign(1, sha256Data), sig, this.toEOSPublicKey());
+        int i = AMASignature.calcPubKeyRecoveryParam(
+            decodeBigIntWithSign(1, sha256Data), sig, this.toAMAPublicKey());
         i += 4; // compressed
         i += 27; // compact  //  24 or 27 :( forcing odd-y 2nd key candidate)
-        return EOSSignature(i, sig.r, sig.s);
+        return AMASignature(i, sig.r, sig.s);
       }
     }
   }
 
   String toString() {
     List<int> version = <int>[];
-    version.add(EOSKey.VERSION);
+    version.add(AMAKey.VERSION);
     Uint8List keyWLeadingVersion =
-        EOSKey.concat(Uint8List.fromList(version), this.d!);
+        AMAKey.concat(Uint8List.fromList(version), this.d!);
 
-    return EOSKey.encodeKey(keyWLeadingVersion, EOSKey.SHA256X2);
+    return AMAKey.encodeKey(keyWLeadingVersion, AMAKey.SHA256X2);
   }
 
   BigInt _deterministicGenerateK(
@@ -246,7 +246,7 @@ class EOSPrivateKey extends EOSKey {
     BigInt T = decodeBigIntWithSign(1, v);
     // Step H3, repeat until T is within the interval [1, n - 1]
     while (T.sign <= 0 ||
-        T.compareTo(EOSKey.secp256k1.n) >= 0 ||
+        T.compareTo(AMAKey.secp256k1.n) >= 0 ||
         !_checkSig(e, Uint8List.fromList(newHash), T)) {
       List<int> d3 = List.from(v)..add(0);
       k = Uint8List.fromList(hMacSha256.convert(d3).bytes);
@@ -262,8 +262,8 @@ class EOSPrivateKey extends EOSKey {
   }
 
   bool _checkSig(BigInt e, Uint8List hash, BigInt k) {
-    BigInt n = EOSKey.secp256k1.n;
-    ECPoint Q = (EOSKey.secp256k1.G * k)!;
+    BigInt n = AMAKey.secp256k1.n;
+    ECPoint Q = (AMAKey.secp256k1.G * k)!;
 
     if (Q.isInfinity) {
       return false;
@@ -274,7 +274,7 @@ class EOSPrivateKey extends EOSKey {
       return false;
     }
 
-    _s = k.modInverse(EOSKey.secp256k1.n) *
+    _s = k.modInverse(AMAKey.secp256k1.n) *
         (e + decodeBigIntWithSign(1, d!) * _r) %
         n;
     if (_s.sign == 0) {
