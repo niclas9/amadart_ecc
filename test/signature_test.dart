@@ -1,32 +1,31 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import '../lib/amadart_ecc.dart';
+import '../lib/amaxdart_ecc.dart';
 import 'package:test/test.dart';
 import 'package:crypto/crypto.dart';
 
 void main() {
-  group('AMA signature tests', () {
-    test('Construct AMA signature from string', () {
+  group('AMAX signature tests', () {
+    test('Construct AMAX signature from string', () {
       String sigStr =
           'SIG_K1_Kg417TSLuhzSpU2bGa21kD1UNaTfAZSCcKmKpZ6fnx3Nqu22gzG3ND4Twur7bzX8oS1J91JvV4rMJcFycGqFBSaY2SJcEQ';
-      AMASignature signature = AMASignature.fromString(sigStr);
+      AMAXSignature signature = AMAXSignature.fromString(sigStr);
       print(signature);
 
       expect(sigStr, signature.toString());
     });
 
     test('Sign the hash using private key', () {
-      AMAPrivateKey privateKey = AMAPrivateKey.fromString(
-          '5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3');
-      AMAPublicKey publicKey = privateKey.toAMAPublicKey();
+      AMAXPrivateKey privateKey = AMAXPrivateKey.fromString('5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3');
+      AMAXPublicKey publicKey = privateKey.toAMAXPublicKey();
       String expectedSig =
           'SIG_K1_Kg417TSLuhzSpU2bGa21kD1UNaTfAZSCcKmKpZ6fnx3Nqu22gzG3ND4Twur7bzX8oS1J91JvV4rMJcFycGqFBSaY2SJcEQ';
 
       String data = 'data';
       Uint8List hashData = sha256.convert(utf8.encode(data)).bytes as Uint8List;
-      AMASignature signature = privateKey.signHash(hashData);
-      AMASignature signature2 = privateKey.signString(data);
+      AMAXSignature signature = privateKey.signHash(hashData);
+      AMAXSignature signature2 = privateKey.signString(data);
 
       print(signature.toString());
       expect(expectedSig, signature.toString());
@@ -38,9 +37,8 @@ void main() {
     });
 
     test('Sign the hash using private key', () {
-      AMAPrivateKey privateKey = AMAPrivateKey.fromString(
-          '5HxT6prWB8VuXkoAaX3eby8bWjquMtCvGuakhC8tGEiPSHfsQLR');
-      AMAPublicKey publicKey = privateKey.toAMAPublicKey();
+      AMAXPrivateKey privateKey = AMAXPrivateKey.fromString('5HxT6prWB8VuXkoAaX3eby8bWjquMtCvGuakhC8tGEiPSHfsQLR');
+      AMAXPublicKey publicKey = privateKey.toAMAXPublicKey();
       String expectedSig =
           'SIG_K1_Kdfe9wknSAKBmgwb3L53CG8KosoHhZ69oVEJrrH5YuWx4JVcJdn1ZV3MU25AVho4mPbeSKW79DVTBAAWj7zGbHTByF1JXU';
 
@@ -79,7 +77,7 @@ void main() {
         201
       ];
       Uint8List hashData = Uint8List.fromList(l);
-      AMASignature signature = privateKey.signHash(hashData);
+      AMAXSignature signature = privateKey.signHash(hashData);
 
       expect(expectedSig, signature.toString());
       print(signature.toString());
@@ -87,9 +85,8 @@ void main() {
     });
 
     test('Sign the hash using private key', () {
-      AMAPrivateKey privateKey = AMAPrivateKey.fromString(
-          '5J9b3xMkbvcT6gYv2EpQ8FD4ZBjgypuNKwE1jxkd7Wd1DYzhk88');
-      AMAPublicKey publicKey = privateKey.toAMAPublicKey();
+      AMAXPrivateKey privateKey = AMAXPrivateKey.fromString('5J9b3xMkbvcT6gYv2EpQ8FD4ZBjgypuNKwE1jxkd7Wd1DYzhk88');
+      AMAXPublicKey publicKey = privateKey.toAMAXPublicKey();
       String expectedSig =
           'SIG_K1_KWfDGxwogny1PUiBAYTfKwPsCSNvM7zWgmXyChdYayZFfyPjddpBUYVdJTq1PjC3PRXADRsqWVU1N2SMQivBDqA7AaRzmB';
 
@@ -128,26 +125,26 @@ void main() {
         142
       ];
       Uint8List hashData = Uint8List.fromList(l);
-      AMASignature signature = privateKey.signHash(hashData);
+      AMAXSignature signature = privateKey.signHash(hashData);
 
       expect(expectedSig, signature.toString());
       print(signature.toString());
       expect(true, signature.verifyHash(hashData, publicKey));
     });
 
-    test('Recover AMAPublicKey from sign data', () {
+    test('Recover AMAXPublicKey from sign data', () {
       const data = 'this is some data to sign';
 
-      var eosPrivateKey = AMAPrivateKey.fromRandom();
-      var eosPublicKey = eosPrivateKey.toAMAPublicKey();
+      var eosPrivateKey = AMAXPrivateKey.fromRandom();
+      var eosPublicKey = eosPrivateKey.toAMAXPublicKey();
 
       var signature = eosPrivateKey.signString(data);
 
-      var recoveredAMAPublicKey = signature.recover(data);
+      var recoveredAMAXPublicKey = signature.recover(data);
 
-      expect(eosPublicKey.toString(), recoveredAMAPublicKey.toString());
-      print('Generated AMAPublicKey : ${eosPublicKey.toString()}');
-      print('Recovered AMAPublicKey : ${recoveredAMAPublicKey.toString()}');
+      expect(eosPublicKey.toString(), recoveredAMAXPublicKey.toString());
+      print('Generated AMAXPublicKey : ${eosPublicKey.toString()}');
+      print('Recovered AMAXPublicKey : ${recoveredAMAXPublicKey.toString()}');
     });
   });
 }

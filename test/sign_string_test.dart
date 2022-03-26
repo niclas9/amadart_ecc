@@ -1,26 +1,24 @@
-import '../lib/amadart_ecc.dart';
+import '../lib/amaxdart_ecc.dart';
 import 'package:test/test.dart';
 
-AMAPrivateKey privateKey = AMAPrivateKey.fromString(
-    '5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3');
-AMAPublicKey publicKey = privateKey.toAMAPublicKey();
+AMAXPrivateKey privateKey = AMAXPrivateKey.fromString('5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3');
+AMAXPublicKey publicKey = privateKey.toAMAXPublicKey();
 
 bool eccSignAndVerify(String data) {
   privateKey.signString(data).toString();
-  AMASignature signature = privateKey.signString(data);
+  AMAXSignature signature = privateKey.signString(data);
   return signature.verify(data, publicKey);
 }
 
 void main() {
-  group('AMA signature string tests', () {
+  group('AMAX signature string tests', () {
     test('ECC Sign #1', () {
       var result = eccSignAndVerify('data');
       expect(result, true);
     });
 
     test('ECC Sign #2', () {
-      var result = eccSignAndVerify(
-          '02dd11a0cd4ec12119e2e72d1a553e657323435e08063ac511d8b7f52802cf9c');
+      var result = eccSignAndVerify('02dd11a0cd4ec12119e2e72d1a553e657323435e08063ac511d8b7f52802cf9c');
       // Error: Value x must be smaller than q
       expect(result, true);
     });

@@ -9,8 +9,8 @@ import 'package:pointycastle/src/utils.dart';
 
 import './exception.dart';
 
-/// abstract AMA Key
-abstract class AMAKey {
+/// abstract AMAX Key
+abstract class AMAXKey {
   static final String SHA256X2 = 'sha256x2';
   static final int VERSION = 0x80;
   static final ECCurve_secp256k1 secp256k1 = ECCurve_secp256k1();
@@ -34,8 +34,7 @@ abstract class AMAKey {
       }
       newChecksum = RIPEMD160Digest().process(check).sublist(0, 4);
     }
-    if (decodeBigIntWithSign(1, checksum) !=
-        decodeBigIntWithSign(1, newChecksum)) {
+    if (decodeBigIntWithSign(1, checksum) != decodeBigIntWithSign(1, newChecksum)) {
       throw InvalidKey("checksum error");
     }
     return key;
